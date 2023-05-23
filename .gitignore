@@ -1,3 +1,4 @@
 .envrc
 .venv
+apikey.py
 __pycache__
