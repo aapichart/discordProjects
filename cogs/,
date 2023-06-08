@@ -1,0 +1,73 @@
+from os import wait
+import nextcord
+from nextcord import interactions
+from nextcord.ext import commands
+
+class surveyform(nextcord.ui.Modal):
+    #  answer1 = [] 
+    #  size_survey = 2
+    name_ui = nextcord.ui.TextInput(label="name")
+    answer_ui = nextcord.ui.TextInput(label="Reason", style=nextcord.TextInputStyle.paragraph)
+    async def on_submit(self, interaction: nextcord.Interaction):
+        title=self.name_ui.value
+        await interaction.response.send_message(f'{title} Submission entered.', ephemeral=True)
+
+    #  async def response_toAnswer(self, interaction:nextcord.Interaction, choice):
+        #  size = len(self.children)
+        #  print(f"the number of children : {size}")
+        #  for x in range(self.size_survey): 
+            #  self.children[x].disabled=True
+            #  self.answer1.append(choice)
+            #  surveyItem1=surveySelect() 
+            #  self.add_item(surveyItem1)
+            #  await interaction.message.edit(view=self)
+            #  await interaction.response.defer() 
+            #  if x == self.size_survey-1:
+                #  print("This is the last component in survey ......")
+                #  await interaction.response.send_message(self.answer1) 
+        #  self.stop()
+
+class surveySelect(nextcord.ui.Select):
+    def __init__(self):
+        options=[
+            nextcord.SelectOption(label="1", value="1"),
+            nextcord.SelectOption(label="2", value="2"),
+            nextcord.SelectOption(label="3", value="3"),
+        ]
+        super().__init__(options=options, min_values=1, max_values=1, placeholder="What is your choices?")
+    async def callback(self, interaction:nextcord.Interaction):
+        surveyfrm=surveyform(title='Information1')
+        await interaction.response.send_modal(surveyfrm)
+
+class surveyText(nextcord.ui.TextInput):
+    def __init__(self, vLabel, vStyle):
+        super().__init__(self, label=vLabel, style=vStyle)
+    async def callback(self, interaction:nextcord.Interaction):
+        await self.view.response_toAnswer(interaction, self.value) 
+
+
+class selectView(nextcord.ui.View):
+    def __init__(self, *, timeout=30):
+        super().__init__(timeout=timeout)
+        self.add_item(surveySelect())
+
+class surveyView(commands.Cog):
+    def __init__(self, bot):
+        self.bot = bot 
+ 
+    @commands.Cog.listener()
+    async def on_ready(self):
+       print("surveyView is loaded .....! ") 
+    
+    @commands.command(name='runsurvey')
+    async def runsurvey(self, ctx):
+        #  await ctx.send("Hello View!")
+        await ctx.send(f'run view success!!!', view=selectView(), delete_after=15) 
+
+
+def setup(bot):
+    bot.add_cog(surveyView(bot))
+    
+
+
+        
